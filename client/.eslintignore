@@ -1,0 +1,18 @@
+# 构建输出
+dist/
+build/
+
+# 依赖目录
+node_modules/
+
+# 类型定义文件
+*.d.ts
+
+# 配置文件
+vite.config.ts
+tsconfig.json
+tsconfig.node.json
+
+# 其他不需要检查的文件
+*.min.js
+*.bundle.js 
