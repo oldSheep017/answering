@@ -1,0 +1,140 @@
+{
+  "questions": [
+    {
+      "type": "choice",
+      "title": "下列哪个是 JavaScript 的基本数据类型？",
+      "options": [
+        "Object",
+        "Array",
+        "String",
+        "Function"
+      ],
+      "answer": "String",
+      "tags": [
+        "编程",
+        "JavaScript"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "type": "choice",
+      "title": "在 React 中，用于处理组件状态的 Hook 是？",
+      "options": [
+        "useEffect",
+        "useState",
+        "useContext",
+        "useReducer"
+      ],
+      "answer": "useState",
+      "tags": [
+        "编程",
+        "React"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "type": "fill",
+      "title": "HTML 中用于创建超链接的标签是 _____。",
+      "answer": "a",
+      "tags": [
+        "编程",
+        "HTML"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "type": "choice",
+      "title": "MongoDB 是一个什么类型的数据库？",
+      "options": [
+        "关系型数据库",
+        "文档型数据库",
+        "键值对数据库",
+        "图数据库"
+      ],
+      "answer": "文档型数据库",
+      "tags": [
+        "数据库",
+        "MongoDB"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "type": "fill",
+      "title": "CSS 中用于设置元素背景颜色的属性是 _____。",
+      "answer": "background-color",
+      "tags": [
+        "编程",
+        "CSS"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "type": "choice",
+      "title": "下列哪个不是 HTTP 请求方法？",
+      "options": [
+        "GET",
+        "POST",
+        "PUT",
+        "SEND"
+      ],
+      "answer": "SEND",
+      "tags": [
+        "网络",
+        "HTTP"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "type": "fill",
+      "title": "JavaScript 中用于声明常量的关键字是 _____。",
+      "answer": "const",
+      "tags": [
+        "编程",
+        "JavaScript"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "type": "choice",
+      "title": "Node.js 是基于什么引擎构建的？",
+      "options": [
+        "V8",
+        "SpiderMonkey",
+        "Chakra",
+        "JavaScriptCore"
+      ],
+      "answer": "V8",
+      "tags": [
+        "编程",
+        "Node.js"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "type": "fill",
+      "title": "Git 中用于查看提交历史的命令是 _____。",
+      "answer": "git log",
+      "tags": [
+        "版本控制",
+        "Git"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "type": "choice",
+      "title": "下列哪个不是前端框架？",
+      "options": [
+        "React",
+        "Vue",
+        "Angular",
+        "Express"
+      ],
+      "answer": "Express",
+      "tags": [
+        "编程",
+        "前端"
+      ],
+      "difficulty": "medium"
+    }
+  ]
+}
