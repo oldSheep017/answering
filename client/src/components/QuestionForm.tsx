@@ -16,6 +16,9 @@ import {
 	Typography
 } from "@mui/material"
 import { Question } from "@/types"
+import { useSelector, useDispatch } from "react-redux"
+import { fetchTags } from "@/store/slices/tagsSlice"
+import { RootState } from "@/store"
 
 const TAG_OPTIONS = ["数学", "英语", "编程", "前端", "后端", "算法", "数据库", "网络"]
 
@@ -37,6 +40,8 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ open, onClose, onSubmit, in
 	const [tags, setTags] = useState<string[]>(initial?.tags || [])
 	const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(initial?.difficulty || "medium")
 	const [error, setError] = useState("")
+	const dispatch = useDispatch()
+	const tagsList = useSelector((state: RootState) => state.tags.items)
 
 	useEffect(() => {
 		if (open) {
@@ -48,8 +53,9 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ open, onClose, onSubmit, in
 			setDifficulty(initial?.difficulty || "medium")
 			setError("")
 		}
+		dispatch(fetchTags())
 		// eslint-disable-next-line
-	}, [open, initial])
+	}, [open, initial, dispatch])
 
 	const handleOptionChange = (idx: number, value: string) => {
 		const newOpts = [...options]
@@ -147,22 +153,27 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ open, onClose, onSubmit, in
 					)}
 					{type === "fill" && <TextField label='标准答案' value={answer} onChange={e => setAnswer(e.target.value)} required />}
 					<FormControl fullWidth>
-						<InputLabel>标签（可多选）</InputLabel>
+						<InputLabel>标签</InputLabel>
 						<Select
 							multiple
 							value={tags}
+							label='标签'
 							onChange={e => setTags(e.target.value as string[])}
-							renderValue={selected => (
-								<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-									{(selected as string[]).map(value => (
-										<Chip key={value} label={value} />
-									))}
-								</Box>
-							)}
+							renderValue={selected =>
+								(selected as string[])
+									.map(t => {
+										const tagObj = tagsList.find(tag => tag._id === t)
+										return tagObj ? tagObj.name : t
+									})
+									.join(", ")
+							}
 						>
-							{TAG_OPTIONS.map(tag => (
-								<MenuItem key={tag} value={tag}>
-									{tag}
+							{tagsList.map(tag => (
+								<MenuItem key={tag._id} value={tag._id}>
+									<Box display='inline-flex' alignItems='center' gap={1}>
+										<span style={{ display: "inline-block", width: 14, height: 14, background: tag.color, borderRadius: 3, marginRight: 4 }} />
+										{tag.name}
+									</Box>
 								</MenuItem>
 							))}
 						</Select>

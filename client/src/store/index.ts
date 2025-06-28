@@ -3,6 +3,7 @@ import themeReducer from "./slices/themeSlice"
 import questionsReducer from "./slices/questionsSlice"
 import historyReducer from "./slices/historySlice"
 import testReducer from "./slices/testSlice"
+import tagsReducer from "./slices/tagsSlice"
 
 /**
  * Redux store 配置
@@ -12,7 +13,8 @@ export const store = configureStore({
 		theme: themeReducer,
 		questions: questionsReducer,
 		history: historyReducer,
-		test: testReducer
+		test: testReducer,
+		tags: tagsReducer
 	},
 	middleware: getDefaultMiddleware =>
 		getDefaultMiddleware({

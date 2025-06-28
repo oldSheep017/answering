@@ -1,14 +1,25 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import { History, ScoreStats, ChartData, Pagination } from "@/types"
 import api from "@/services/api"
+import { HistoryRecord } from "@/types"
+
+export interface HistoryQuery {
+	page?: number
+	limit?: number
+	sortBy?: string
+	sortOrder?: "asc" | "desc"
+	startDate?: string
+	endDate?: string
+}
 
 interface HistoryState {
-	items: History[]
+	items: HistoryRecord[]
 	loading: boolean
 	error: string | null
 	pagination: Pagination
 	stats: ScoreStats | null
 	chartData: ChartData[]
+	query: HistoryQuery
 }
 
 const initialState: HistoryState = {
@@ -22,27 +33,17 @@ const initialState: HistoryState = {
 		pages: 0
 	},
 	stats: null,
-	chartData: []
+	chartData: [],
+	query: { page: 1, limit: 10, sortBy: "createdAt", sortOrder: "desc" }
 }
 
 /**
  * 异步 action：获取历史记录列表
  */
-export const fetchHistories = createAsyncThunk(
-	"history/fetchHistories",
-	async (params?: {
-		page?: number
-		limit?: number
-		userId?: string
-		startDate?: string
-		endDate?: string
-		sortBy?: string
-		sortOrder?: "asc" | "desc"
-	}) => {
-		const response = await api.getHistories(params)
-		return response
-	}
-)
+export const fetchHistory = createAsyncThunk("history/fetchHistory", async (params: HistoryQuery = {}) => {
+	const res = await api.get("/history", { params })
+	return res.data
+})
 
 /**
  * 异步 action：获取成绩统计
@@ -83,21 +84,25 @@ const historySlice = createSlice({
 			state.pagination = initialState.pagination
 			state.stats = null
 			state.chartData = []
+			state.query = initialState.query
+		},
+		setHistoryQuery(state, action) {
+			state.query = { ...state.query, ...action.payload }
 		}
 	},
 	extraReducers: builder => {
-		// fetchHistories
+		// fetchHistory
 		builder
-			.addCase(fetchHistories.pending, state => {
+			.addCase(fetchHistory.pending, state => {
 				state.loading = true
 				state.error = null
 			})
-			.addCase(fetchHistories.fulfilled, (state, action) => {
+			.addCase(fetchHistory.fulfilled, (state, action) => {
 				state.loading = false
-				state.items = action.payload.histories
+				state.items = action.payload.items
 				state.pagination = action.payload.pagination
 			})
-			.addCase(fetchHistories.rejected, (state, action) => {
+			.addCase(fetchHistory.rejected, (state, action) => {
 				state.loading = false
 				state.error = action.error.message || "获取历史记录失败"
 			})
@@ -127,5 +132,5 @@ const historySlice = createSlice({
 	}
 })
 
-export const { clearError, reset } = historySlice.actions
+export const { clearError, reset, setHistoryQuery } = historySlice.actions
 export default historySlice.reducer

@@ -221,3 +221,23 @@ export interface AppState {
 		error: string | null
 	}
 }
+
+export interface Tag {
+	_id: string
+	name: string
+	desc?: string
+	color?: string
+	createdAt?: string
+	updatedAt?: string
+}
+
+export interface HistoryRecord {
+	_id: string
+	createdAt: string
+	score: number
+	total: number
+	duration: number
+	questions: any[]
+	answers: any[]
+	// 可根据实际需要补充更多字段
+}

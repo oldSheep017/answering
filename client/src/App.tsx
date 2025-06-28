@@ -11,6 +11,7 @@ import Questions from "./pages/Questions"
 import History from "./pages/History"
 import Test from "./pages/Test"
 import ErrorBoundary from "./components/ErrorBoundary"
+import TagManager from "./pages/TagManager"
 
 /**
  * 主应用组件
@@ -29,6 +30,7 @@ const App: React.FC = () => {
 						<Route path='/questions' element={<Questions />} />
 						<Route path='/history' element={<History />} />
 						<Route path='/test' element={<Test />} />
+						<Route path='/manager/tags' element={<TagManager />} />
 					</Routes>
 				</Layout>
 			</ThemeProvider>

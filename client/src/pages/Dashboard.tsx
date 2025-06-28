@@ -38,6 +38,13 @@ const DASHBOARD_CARDS = [
 		color: "info",
 		to: "/test",
 		desc: "开始自测，随机生成试卷"
+	},
+	{
+		title: "标签管理",
+		value: "",
+		color: "info",
+		to: "/manager/tags",
+		desc: "自定义题库标签"
 	}
 ]
 
