@@ -25,9 +25,11 @@ class Database {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         maxPoolSize: 10,
-        serverSelectionTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 30000, // 增加超时时间
         socketTimeoutMS: 45000,
         bufferCommands: false,
+        retryWrites: true,
+        retryReads: true,
       };
 
       await mongoose.connect(uri, options);

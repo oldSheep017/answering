@@ -8,56 +8,39 @@ const { asyncHandler, AppError } = require('../middleware/errorHandler');
  */
 
 /**
- * 获取历史记录列表
- * @param {Object} req - 请求对象
- * @param {Object} res - 响应对象
+ * 获取历史记录列表，支持分页、排序、日期筛选
+ * query: page, limit, sortBy, sortOrder, startDate, endDate
  */
 const getHistories = asyncHandler(async (req, res) => {
-  const {
-    page = 1,
-    limit = 10,
-    userId = 'anonymous',
-    startDate,
-    endDate,
-    sortBy = 'date',
-    sortOrder = 'desc',
-  } = req.query;
-
-  // 构建查询条件
-  const query = { userId };
-
-  if (startDate || endDate) {
-    query.date = {};
-    if (startDate) query.date.$gte = new Date(startDate);
-    if (endDate) query.date.$lte = new Date(endDate);
-  }
-
-  // 构建排序条件
-  const sort = {};
-  sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
-
-  // 分页
-  const skip = (parseInt(page) - 1) * parseInt(limit);
-  const histories = await History.find(query)
-    .sort(sort)
-    .skip(skip)
-    .limit(parseInt(limit))
-    .lean();
-
-  const total = await History.countDocuments(query);
-
-  res.json({
-    success: true,
-    data: {
-      histories,
+  try {
+    let { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc', startDate, endDate } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
+    const filter = {};
+    if (startDate || endDate) {
+      filter.createdAt = {};
+      if (startDate) filter.createdAt.$gte = new Date(startDate);
+      if (endDate) filter.createdAt.$lte = new Date(endDate);
+    }
+    const total = await History.countDocuments(filter);
+    const items = await History.find(filter)
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+    res.json({
+      items,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page,
+        limit,
         total,
-        pages: Math.ceil(total / parseInt(limit)),
-      },
-    },
-  });
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 /**

@@ -17,6 +17,12 @@ services:
       - ./mongo-init:/docker-entrypoint-initdb.d
     networks:
       - question-bank-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # 后端服务器
   server:
@@ -34,7 +40,8 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     networks:
       - question-bank-network
 

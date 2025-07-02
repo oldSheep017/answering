@@ -11,6 +11,7 @@ const database = require('./config/database');
 // 导入路由
 const questionRoutes = require('./routes/questions');
 const historyRoutes = require('./routes/history');
+const tagRoutes = require('./routes/tags');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,11 +20,26 @@ const PORT = process.env.PORT || 5000;
  * 连接数据库
  */
 const connectDatabase = async () => {
-  try {
-    await database.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/question-bank');
-  } catch (error) {
-    console.error('❌ 数据库连接失败:', error);
-    process.exit(1);
+  const maxRetries = 5;
+  const retryDelay = 5000; // 5秒
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🔄 尝试连接数据库 (第 ${attempt}/${maxRetries} 次)...`);
+      await database.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/question-bank');
+      console.log('✅ 数据库连接成功');
+      return;
+    } catch (error) {
+      console.error(`❌ 数据库连接失败 (第 ${attempt}/${maxRetries} 次):`, error.message);
+      
+      if (attempt === maxRetries) {
+        console.error('❌ 数据库连接最终失败，退出程序');
+        process.exit(1);
+      }
+      
+      console.log(`⏳ ${retryDelay / 1000} 秒后重试...`);
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
+    }
   }
 };
 
@@ -56,6 +72,7 @@ const applyRoutes = () => {
   // API 路由
   app.use('/api/questions', questionRoutes);
   app.use('/api/history', historyRoutes);
+  app.use('/api/tags', tagRoutes);
 
   // 健康检查
   app.get('/health', (req, res) => {
