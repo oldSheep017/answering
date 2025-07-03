@@ -1,6 +1,6 @@
 import React, { useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { RootState } from "@/store"
+import { RootState, AppDispatch } from "@/store"
 import TestConfigForm from "@/components/TestConfigForm"
 import TestPaper from "@/components/TestPaper"
 import TestResultComp from "@/components/TestResult"
@@ -22,7 +22,7 @@ import { CircularProgress, Box } from "@mui/material"
  * 测试页面组件
  */
 const Test: React.FC = () => {
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<AppDispatch>()
 	const test = useSelector((state: RootState) => state.test)
 
 	// 开始测试
@@ -80,15 +80,20 @@ const Test: React.FC = () => {
 					totalQuestions: test.result.totalQuestions,
 					correctAnswers: test.result.correctAnswers,
 					timeSpent: test.result.timeSpent,
-					details: test.currentTest.map((q, idx) => ({
-						questionId: q._id,
-						userAnswer: test.answers[idx],
-						isCorrect: (test.answers[idx] || "").trim().toLowerCase() === q.answer.trim().toLowerCase(),
-						questionType: q.type,
-						questionTitle: q.title,
-						correctAnswer: q.answer,
-						options: q.options
-					})),
+					details: test.currentTest.map((q, idx) => {
+						const userAnswer = typeof test.answers[idx] === "string" ? test.answers[idx].trim().toLowerCase() : ""
+						const correctAnswer = typeof q.answer === "string" ? q.answer.trim().toLowerCase() : ""
+						const isCorrect = userAnswer === correctAnswer
+						return {
+							questionId: q._id,
+							userAnswer: test.answers[idx],
+							isCorrect,
+							questionType: q.type,
+							questionTitle: q.title,
+							correctAnswer: q.answer,
+							options: q.options
+						}
+					}),
 					tags: [],
 					testType: "random",
 					createdAt: "",
