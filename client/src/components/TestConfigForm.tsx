@@ -101,7 +101,18 @@ const TestConfigForm: React.FC<TestConfigFormProps> = ({ loading, onStart }) => 
 				</FormControl>
 				<FormControl fullWidth>
 					<InputLabel>难度</InputLabel>
-					<Select value={difficulty} onChange={e => setDifficulty(e.target.value as any)} label='难度'>
+					<Select
+						value={difficulty}
+						onChange={e => setDifficulty(e.target.value as any)}
+						label='难度'
+						renderValue={selected => {
+							if (!selected) return "不限"
+							if (selected === "easy") return "简单"
+							if (selected === "medium") return "中等"
+							if (selected === "hard") return "困难"
+							return selected
+						}}
+					>
 						<MenuItem value=''>不限</MenuItem>
 						<MenuItem value='easy'>简单</MenuItem>
 						<MenuItem value='medium'>中等</MenuItem>

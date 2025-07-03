@@ -83,9 +83,10 @@ const TestPaper: React.FC<TestPaperProps> = ({
 				<CardContent>
 					<Stack direction='row' spacing={1} alignItems='center' mb={1}>
 						<Chip label={q.type === "choice" ? "选择题" : "填空题"} color={q.type === "choice" ? "primary" : "success"} size='small' />
-						{q.tags.map(tag => (
-							<Chip key={tag} label={tag} size='small' variant='outlined' />
-						))}
+						{q.tags.map(tag => {
+							const tagLabel = typeof tag === "string" ? tag : tag.name
+							return <Chip key={typeof tag === "string" ? tag : tag._id} label={tagLabel} size='small' variant='outlined' />
+						})}
 						<Chip label={q.difficulty === "easy" ? "简单" : q.difficulty === "medium" ? "中等" : "困难"} size='small' color='secondary' />
 					</Stack>
 					<Typography variant='h6' gutterBottom>
