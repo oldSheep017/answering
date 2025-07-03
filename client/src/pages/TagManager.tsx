@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { RootState } from "@/store"
+import { RootState, AppDispatch } from "@/store"
 import { fetchTags, createTag, updateTag, deleteTag } from "@/store/slices/tagsSlice"
 import { Tag } from "@/types"
 import {
@@ -24,7 +24,7 @@ import { Add, Edit, Delete, Palette } from "@mui/icons-material"
 const COLOR_PRESETS = ["#4361ee", "#f72585", "#3bb273", "#ffb703", "#ff6d00", "#00b4d8", "#7209b7", "#22223b"]
 
 const TagManager: React.FC = () => {
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<AppDispatch>()
 	const { items: tags, loading } = useSelector((state: RootState) => state.tags)
 	const [dialogOpen, setDialogOpen] = useState(false)
 	const [editData, setEditData] = useState<Tag | null>(null)
@@ -64,16 +64,16 @@ const TagManager: React.FC = () => {
 			return
 		}
 		if (editData) {
-			dispatch(updateTag({ id: editData._id, data: form }) as any)
+			dispatch(updateTag({ id: editData._id, data: form }))
 		} else {
-			dispatch(createTag(form) as any)
+			dispatch(createTag(form))
 		}
 		setDialogOpen(false)
 	}
 
 	const handleDelete = (id: string) => {
 		if (window.confirm("确定要删除该标签吗？")) {
-			dispatch(deleteTag(id) as any)
+			dispatch(deleteTag(id))
 		}
 	}
 

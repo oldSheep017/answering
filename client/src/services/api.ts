@@ -9,7 +9,8 @@ import {
 	ScoreStatsResponse,
 	RandomTestResponse,
 	SubmitTestResponse,
-	TestConfig
+	TestConfig,
+	Tag
 } from "@/types"
 
 /**
@@ -301,6 +302,56 @@ class ApiService {
 		try {
 			const response = await this.createInstance().get("/health")
 			return response.data
+		} catch (error) {
+			this.handleError(error)
+		}
+	}
+
+	// ==================== 标签管理 API ====================
+
+	/**
+	 * 获取所有标签
+	 */
+	async getTags(): Promise<Tag[]> {
+		try {
+			const response = await this.createInstance().get<ApiResponse<Tag[]>>("/tags")
+			return this.handleResponse(response)
+		} catch (error) {
+			this.handleError(error)
+		}
+	}
+
+	/**
+	 * 创建标签
+	 */
+	async createTag(data: { name: string; desc?: string; color?: string }): Promise<Tag> {
+		try {
+			const response = await this.createInstance().post<ApiResponse<Tag>>("/tags", data)
+			return this.handleResponse(response)
+		} catch (error) {
+			this.handleError(error)
+		}
+	}
+
+	/**
+	 * 更新标签
+	 */
+	async updateTag(id: string, data: { name: string; desc?: string; color?: string }): Promise<Tag> {
+		try {
+			const response = await this.createInstance().put<ApiResponse<Tag>>(`/tags/${id}`, data)
+			return this.handleResponse(response)
+		} catch (error) {
+			this.handleError(error)
+		}
+	}
+
+	/**
+	 * 删除标签
+	 */
+	async deleteTag(id: string): Promise<{ message: string }> {
+		try {
+			const response = await this.createInstance().delete<ApiResponse<{ message: string }>>(`/tags/${id}`)
+			return this.handleResponse(response)
 		} catch (error) {
 			this.handleError(error)
 		}

@@ -18,9 +18,7 @@ import {
 import { Question } from "@/types"
 import { useSelector, useDispatch } from "react-redux"
 import { fetchTags } from "@/store/slices/tagsSlice"
-import { RootState } from "@/store"
-
-const TAG_OPTIONS = ["数学", "英语", "编程", "前端", "后端", "算法", "数据库", "网络"]
+import { RootState, AppDispatch } from "@/store"
 
 interface QuestionFormProps {
 	open: boolean
@@ -40,7 +38,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ open, onClose, onSubmit, in
 	const [tags, setTags] = useState<string[]>(initial?.tags || [])
 	const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(initial?.difficulty || "medium")
 	const [error, setError] = useState("")
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<AppDispatch>()
 	const tagsList = useSelector((state: RootState) => state.tags.items)
 
 	useEffect(() => {

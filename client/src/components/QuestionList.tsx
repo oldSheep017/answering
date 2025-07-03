@@ -23,8 +23,9 @@ import {
 } from "@mui/material"
 import { Delete, Edit, FilterList, Download, Upload } from "@mui/icons-material"
 import { useDispatch, useSelector } from "react-redux"
-import { RootState } from "@/store"
+import { RootState, AppDispatch } from "@/store"
 import { fetchQuestions, deleteQuestion, fetchQuestionStats } from "@/store/slices/questionsSlice"
+import { fetchTags } from "@/store/slices/tagsSlice"
 import { Question } from "@/types"
 
 interface QuestionListProps {
@@ -34,32 +35,40 @@ interface QuestionListProps {
 	defaultType?: string
 }
 
-const TAG_OPTIONS = ["数学", "英语", "编程", "前端", "后端", "算法", "数据库", "网络"]
-
 /**
  * 题目列表组件
  */
 const QuestionList: React.FC<QuestionListProps> = ({ onEdit, onImport, onExport, defaultType = "" }) => {
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<AppDispatch>()
 	const { items, loading, pagination, stats } = useSelector((state: RootState) => state.questions)
+	const { items: tags } = useSelector((state: RootState) => state.tags)
 	const [search, setSearch] = useState("")
-	const [type, setType] = useState(defaultType)
-	const [difficulty, setDifficulty] = useState("")
+	const [type, setType] = useState<"choice" | "fill" | "">(defaultType as "choice" | "fill" | "")
+	const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | "">("")
 	const [tag, setTag] = useState("")
 	const [page, setPage] = useState(1)
 	const [deleteId, setDeleteId] = useState<string | null>(null)
 
 	useEffect(() => {
-		setType(defaultType)
+		setType(defaultType as "choice" | "fill" | "")
 	}, [defaultType])
 
 	useEffect(() => {
-		dispatch(fetchQuestions({ page, search, type, difficulty, tags: tag }))
+		dispatch(
+			fetchQuestions({
+				page,
+				search,
+				type: type || undefined,
+				difficulty: difficulty || undefined,
+				tags: tag || undefined
+			})
+		)
 		// eslint-disable-next-line
 	}, [page, search, type, difficulty, tag])
 
 	useEffect(() => {
 		dispatch(fetchQuestionStats())
+		dispatch(fetchTags())
 		// eslint-disable-next-line
 	}, [])
 
@@ -74,13 +83,25 @@ const QuestionList: React.FC<QuestionListProps> = ({ onEdit, onImport, onExport,
 		}
 	}
 
+	// 获取标签名称
+	const getTagName = (tagId: string) => {
+		const tag = tags.find(t => t._id === tagId)
+		return tag ? tag.name : tagId
+	}
+
+	// 获取标签颜色
+	const getTagColor = (tagId: string) => {
+		const tag = tags.find(t => t._id === tagId)
+		return tag ? tag.color : undefined
+	}
+
 	return (
 		<Box>
 			<Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={2} alignItems='center'>
 				<TextField label='搜索题干/标签' value={search} onChange={e => setSearch(e.target.value)} size='small' sx={{ minWidth: 180 }} />
 				<FormControl size='small' sx={{ minWidth: 120 }}>
 					<InputLabel>题型</InputLabel>
-					<Select value={type} label='题型' onChange={e => setType(e.target.value)}>
+					<Select value={type} label='题型' onChange={e => setType(e.target.value as "choice" | "fill" | "")}>
 						<MenuItem value=''>全部</MenuItem>
 						<MenuItem value='choice'>选择题</MenuItem>
 						<MenuItem value='fill'>填空题</MenuItem>
@@ -88,7 +109,7 @@ const QuestionList: React.FC<QuestionListProps> = ({ onEdit, onImport, onExport,
 				</FormControl>
 				<FormControl size='small' sx={{ minWidth: 120 }}>
 					<InputLabel>难度</InputLabel>
-					<Select value={difficulty} label='难度' onChange={e => setDifficulty(e.target.value)}>
+					<Select value={difficulty} label='难度' onChange={e => setDifficulty(e.target.value as "easy" | "medium" | "hard" | "")}>
 						<MenuItem value=''>全部</MenuItem>
 						<MenuItem value='easy'>简单</MenuItem>
 						<MenuItem value='medium'>中等</MenuItem>
@@ -99,9 +120,12 @@ const QuestionList: React.FC<QuestionListProps> = ({ onEdit, onImport, onExport,
 					<InputLabel>标签</InputLabel>
 					<Select value={tag} label='标签' onChange={e => setTag(e.target.value)}>
 						<MenuItem value=''>全部</MenuItem>
-						{TAG_OPTIONS.map(t => (
-							<MenuItem key={t} value={t}>
-								{t}
+						{tags.map(t => (
+							<MenuItem key={t._id} value={t._id}>
+								<Box display='inline-flex' alignItems='center' gap={1}>
+									<span style={{ display: "inline-block", width: 14, height: 14, background: t.color, borderRadius: 3, marginRight: 4 }} />
+									{t.name}
+								</Box>
 							</MenuItem>
 						))}
 					</Select>
@@ -124,9 +148,24 @@ const QuestionList: React.FC<QuestionListProps> = ({ onEdit, onImport, onExport,
 							<CardContent>
 								<Stack direction='row' spacing={1} alignItems='center' mb={1}>
 									<Chip label={q.type === "choice" ? "选择题" : "填空题"} color={q.type === "choice" ? "primary" : "success"} size='small' />
-									{q.tags.map(tag => (
-										<Chip key={tag} label={tag} size='small' variant='outlined' />
-									))}
+									{q.tags.map(tag => {
+										const tagName = typeof tag === "string" ? getTagName(tag) : tag.name
+										const tagColor = typeof tag === "string" ? getTagColor(tag) : tag.color
+										return (
+											<Chip
+												key={typeof tag === "string" ? tag : tag._id}
+												label={tagName}
+												size='small'
+												variant='outlined'
+												sx={{
+													bgcolor: tagColor,
+													color: "#fff",
+													borderColor: tagColor,
+													"&:hover": { bgcolor: tagColor }
+												}}
+											/>
+										)
+									})}
 									<Chip label={q.difficulty === "easy" ? "简单" : q.difficulty === "medium" ? "中等" : "困难"} size='small' color='secondary' />
 								</Stack>
 								<Typography variant='subtitle1' gutterBottom noWrap>

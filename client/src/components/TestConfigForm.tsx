@@ -1,8 +1,9 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Box, Button, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, TextField, Typography, Stack } from "@mui/material"
 import { TestConfig } from "@/types"
-
-const TAG_OPTIONS = ["数学", "英语", "编程", "前端", "后端", "算法", "数据库", "网络"]
+import { useSelector, useDispatch } from "react-redux"
+import { fetchTags } from "@/store/slices/tagsSlice"
+import { RootState, AppDispatch } from "@/store"
 
 interface TestConfigFormProps {
 	loading?: boolean
@@ -17,6 +18,12 @@ const TestConfigForm: React.FC<TestConfigFormProps> = ({ loading, onStart }) => 
 	const [types, setTypes] = useState<("choice" | "fill")[]>(["choice", "fill"])
 	const [tags, setTags] = useState<string[]>([])
 	const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | "">("")
+	const dispatch = useDispatch<AppDispatch>()
+	const tagsList = useSelector((state: RootState) => state.tags.items)
+
+	useEffect(() => {
+		dispatch(fetchTags())
+	}, [dispatch])
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
@@ -75,15 +82,19 @@ const TestConfigForm: React.FC<TestConfigFormProps> = ({ loading, onStart }) => 
 						input={<OutlinedInput label='标签（可多选）' />}
 						renderValue={selected => (
 							<Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-								{(selected as string[]).map(value => (
-									<Chip key={value} label={value} />
-								))}
+								{(selected as string[]).map(tagId => {
+									const tag = tagsList.find(t => t._id === tagId)
+									return tag ? <Chip key={tagId} label={tag.name} sx={{ bgcolor: tag.color, color: "#fff" }} /> : null
+								})}
 							</Box>
 						)}
 					>
-						{TAG_OPTIONS.map(tag => (
-							<MenuItem key={tag} value={tag}>
-								{tag}
+						{tagsList.map(tag => (
+							<MenuItem key={tag._id} value={tag._id}>
+								<Box display='inline-flex' alignItems='center' gap={1}>
+									<span style={{ display: "inline-block", width: 14, height: 14, background: tag.color, borderRadius: 3, marginRight: 4 }} />
+									{tag.name}
+								</Box>
 							</MenuItem>
 						))}
 					</Select>

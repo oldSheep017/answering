@@ -38,7 +38,12 @@ const questionSchema = new mongoose.Schema(
       trim: true,
     },
     tags: {
-      type: [String],
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Tag',
+        },
+      ],
       default: [],
       validate: {
         validator: function (tags) {
@@ -76,4 +81,4 @@ questionSchema.virtual('typeText').get(function () {
 questionSchema.set('toJSON', { virtuals: true });
 questionSchema.set('toObject', { virtuals: true });
 
-module.exports = mongoose.model('Question', questionSchema); 
+module.exports = mongoose.model('Question', questionSchema);

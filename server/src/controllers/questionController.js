@@ -29,14 +29,11 @@ const getQuestions = asyncHandler(async (req, res) => {
   if (type) query.type = type;
   if (difficulty) query.difficulty = difficulty;
   if (tags) {
-    const tagArray = tags.split(',').map(tag => tag.trim());
+    const tagArray = tags.split(',').map((tag) => tag.trim());
     query.tags = { $in: tagArray };
   }
   if (search) {
-    query.$or = [
-      { title: { $regex: search, $options: 'i' } },
-      { tags: { $in: [new RegExp(search, 'i')] } },
-    ];
+    query.$or = [{ title: { $regex: search, $options: 'i' } }];
   }
 
   // 构建排序条件
@@ -46,6 +43,7 @@ const getQuestions = asyncHandler(async (req, res) => {
   // 分页
   const skip = (parseInt(page) - 1) * parseInt(limit);
   const questions = await Question.find(query)
+    .populate('tags', 'name color desc')
     .sort(sort)
     .skip(skip)
     .limit(parseInt(limit))
@@ -75,7 +73,9 @@ const getQuestions = asyncHandler(async (req, res) => {
 const getQuestion = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const question = await Question.findById(id).lean();
+  const question = await Question.findById(id)
+    .populate('tags', 'name color desc')
+    .lean();
 
   if (!question) {
     throw new AppError('题目不存在', 404);
@@ -146,7 +146,7 @@ const updateQuestion = asyncHandler(async (req, res) => {
       difficulty: difficulty || 'medium',
     },
     { new: true, runValidators: true }
-  );
+  ).populate('tags', 'name color desc');
 
   res.json({
     success: true,
@@ -190,9 +190,10 @@ const importQuestions = asyncHandler(async (req, res) => {
   }
 
   // 验证题目数据
-  const validQuestions = questions.filter(q => {
+  const validQuestions = questions.filter((q) => {
     if (!q.type || !q.title || !q.answer) return false;
-    if (q.type === 'choice' && (!q.options || q.options.length !== 4)) return false;
+    if (q.type === 'choice' && (!q.options || q.options.length !== 4))
+      return false;
     return true;
   });
 
@@ -222,11 +223,12 @@ const exportQuestions = asyncHandler(async (req, res) => {
   const query = { isActive: true };
   if (type) query.type = type;
   if (tags) {
-    const tagArray = tags.split(',').map(tag => tag.trim());
+    const tagArray = tags.split(',').map((tag) => tag.trim());
     query.tags = { $in: tagArray };
   }
 
   const questions = await Question.find(query)
+    .populate('tags', 'name color desc')
     .select('-__v -createdAt -updatedAt')
     .lean();
 
@@ -276,8 +278,16 @@ const getQuestionStats = asyncHandler(async (req, res) => {
     { $match: { isActive: true } },
     { $unwind: '$tags' },
     {
+      $lookup: {
+        from: 'tags',
+        localField: 'tags',
+        foreignField: '_id',
+        as: 'tagInfo',
+      },
+    },
+    {
       $group: {
-        _id: '$tags',
+        _id: { $arrayElemAt: ['$tagInfo._id', 0] },
         count: { $sum: 1 },
       },
     },
@@ -303,4 +313,4 @@ module.exports = {
   importQuestions,
   exportQuestions,
   getQuestionStats,
-}; 
+};

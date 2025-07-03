@@ -13,7 +13,14 @@ const { asyncHandler, AppError } = require('../middleware/errorHandler');
  */
 const getHistories = asyncHandler(async (req, res) => {
   try {
-    let { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc', startDate, endDate } = req.query;
+    let {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      startDate,
+      endDate,
+    } = req.query;
     page = parseInt(page);
     limit = parseInt(limit);
     const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
@@ -25,6 +32,7 @@ const getHistories = asyncHandler(async (req, res) => {
     }
     const total = await History.countDocuments(filter);
     const items = await History.find(filter)
+      .populate('tags', 'name color desc')
       .sort(sort)
       .skip((page - 1) * limit)
       .limit(limit)
@@ -35,8 +43,8 @@ const getHistories = asyncHandler(async (req, res) => {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (err) {
     next(err);
@@ -51,7 +59,9 @@ const getHistories = asyncHandler(async (req, res) => {
 const getHistory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const history = await History.findById(id).lean();
+  const history = await History.findById(id)
+    .populate('tags', 'name color desc')
+    .lean();
 
   if (!history) {
     throw new AppError('历史记录不存在', 404);
@@ -149,12 +159,20 @@ const generateRandomTest = asyncHandler(async (req, res) => {
     { $match: query },
     { $sample: { size: parseInt(questionCount) } },
     {
+      $lookup: {
+        from: 'tags',
+        localField: 'tags',
+        foreignField: '_id',
+        as: 'tagInfo',
+      },
+    },
+    {
       $project: {
         _id: 1,
         type: 1,
         title: 1,
         options: 1,
-        tags: 1,
+        tags: '$tagInfo',
         difficulty: 1,
       },
     },
@@ -199,13 +217,13 @@ const submitTest = asyncHandler(async (req, res) => {
   }
 
   // 获取正确答案并计算得分
-  const questionIds = questions.map(q => q._id);
+  const questionIds = questions.map((q) => q._id);
   const correctQuestions = await Question.find({
     _id: { $in: questionIds },
   }).lean();
 
   const questionMap = new Map(
-    correctQuestions.map(q => [q._id.toString(), q])
+    correctQuestions.map((q) => [q._id.toString(), q])
   );
 
   let correctAnswers = 0;
@@ -218,8 +236,9 @@ const submitTest = asyncHandler(async (req, res) => {
 
     if (!correctQuestion) continue;
 
-    const isCorrect = userAnswer.trim().toLowerCase() === 
-                     correctQuestion.answer.trim().toLowerCase();
+    const isCorrect =
+      userAnswer.trim().toLowerCase() ===
+      correctQuestion.answer.trim().toLowerCase();
 
     if (isCorrect) correctAnswers++;
 
@@ -300,8 +319,8 @@ const getScoreStats = asyncHandler(async (req, res) => {
     const totalC = histories.reduce((sum, h) => sum + h.correctAnswers, 0);
 
     stats.averageScore = Math.round(totalScore / histories.length);
-    stats.bestScore = Math.max(...histories.map(h => h.score));
-    stats.worstScore = Math.min(...histories.map(h => h.score));
+    stats.bestScore = Math.max(...histories.map((h) => h.score));
+    stats.worstScore = Math.min(...histories.map((h) => h.score));
     stats.totalQuestions = totalQ;
     stats.totalCorrect = totalC;
     stats.averageTime = Math.round(totalTime / histories.length);
@@ -327,7 +346,7 @@ const getScoreStats = asyncHandler(async (req, res) => {
   }, {});
 
   // 转换为数组并计算平均值
-  const chartData = Object.values(dailyStats).map(day => ({
+  const chartData = Object.values(dailyStats).map((day) => ({
     date: day.date,
     averageScore: Math.round(day.score / day.count),
     testCount: day.count,
@@ -373,4 +392,4 @@ module.exports = {
   submitTest,
   getScoreStats,
   deleteHistory,
-}; 
+};

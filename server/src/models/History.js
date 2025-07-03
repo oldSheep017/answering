@@ -72,7 +72,12 @@ const historySchema = new mongoose.Schema(
       },
     ],
     tags: {
-      type: [String],
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Tag',
+        },
+      ],
       default: [],
     },
     testType: {
@@ -108,4 +113,4 @@ historySchema.virtual('timeSpentFormatted').get(function () {
 historySchema.set('toJSON', { virtuals: true });
 historySchema.set('toObject', { virtuals: true });
 
-module.exports = mongoose.model('History', historySchema); 
+module.exports = mongoose.model('History', historySchema);

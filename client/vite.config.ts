@@ -21,6 +21,18 @@ export default defineConfig({
 	},
 	build: {
 		outDir: "dist",
-		sourcemap: true
+		sourcemap: true,
+		rollupOptions: {
+			output: {
+				entryFileNames: `assets/[name]-[hash].js`,
+				chunkFileNames: `assets/[name]-[hash].js`,
+				assetFileNames: `assets/[name]-[hash].[ext]`
+			}
+		},
+		manifest: true
+	},
+	define: {
+		__BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+		__VERSION__: JSON.stringify("1.0.0")
 	}
 })

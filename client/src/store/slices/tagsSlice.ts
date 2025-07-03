@@ -4,25 +4,25 @@ import api from "@/services/api"
 
 // 获取所有标签
 export const fetchTags = createAsyncThunk("tags/fetchTags", async () => {
-	const res = await api.get("/tags")
-	return res.data as Tag[]
+	return await api.getTags()
 })
 
 // 新建标签
-export const createTag = createAsyncThunk("tags/createTag", async (data: Partial<Tag>) => {
-	const res = await api.post("/tags", data)
-	return res.data as Tag
+export const createTag = createAsyncThunk("tags/createTag", async (data: { name: string; desc?: string; color?: string }) => {
+	return await api.createTag(data)
 })
 
 // 编辑标签
-export const updateTag = createAsyncThunk("tags/updateTag", async ({ id, data }: { id: string; data: Partial<Tag> }) => {
-	const res = await api.put(`/tags/${id}`, data)
-	return res.data as Tag
-})
+export const updateTag = createAsyncThunk(
+	"tags/updateTag",
+	async ({ id, data }: { id: string; data: { name: string; desc?: string; color?: string } }) => {
+		return await api.updateTag(id, data)
+	}
+)
 
 // 删除标签
 export const deleteTag = createAsyncThunk("tags/deleteTag", async (id: string) => {
-	await api.delete(`/tags/${id}`)
+	await api.deleteTag(id)
 	return id
 })
 

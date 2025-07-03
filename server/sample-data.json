@@ -1,4 +1,71 @@
 {
+  "tags": [
+    {
+      "name": "编程",
+      "desc": "编程相关题目",
+      "color": "#4361ee"
+    },
+    {
+      "name": "JavaScript",
+      "desc": "JavaScript 语言相关",
+      "color": "#f72585"
+    },
+    {
+      "name": "React",
+      "desc": "React 框架相关",
+      "color": "#3bb273"
+    },
+    {
+      "name": "HTML",
+      "desc": "HTML 标记语言",
+      "color": "#ffb703"
+    },
+    {
+      "name": "CSS",
+      "desc": "CSS 样式相关",
+      "color": "#ff6d00"
+    },
+    {
+      "name": "数据库",
+      "desc": "数据库相关",
+      "color": "#00b4d8"
+    },
+    {
+      "name": "MongoDB",
+      "desc": "MongoDB 数据库",
+      "color": "#7209b7"
+    },
+    {
+      "name": "网络",
+      "desc": "网络协议相关",
+      "color": "#22223b"
+    },
+    {
+      "name": "HTTP",
+      "desc": "HTTP 协议",
+      "color": "#4361ee"
+    },
+    {
+      "name": "Node.js",
+      "desc": "Node.js 运行时",
+      "color": "#f72585"
+    },
+    {
+      "name": "版本控制",
+      "desc": "版本控制工具",
+      "color": "#3bb273"
+    },
+    {
+      "name": "Git",
+      "desc": "Git 版本控制",
+      "color": "#ffb703"
+    },
+    {
+      "name": "前端",
+      "desc": "前端开发相关",
+      "color": "#ff6d00"
+    }
+  ],
   "questions": [
     {
       "type": "choice",

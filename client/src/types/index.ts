@@ -7,7 +7,7 @@ export interface Question {
 	title: string
 	options: string[]
 	answer: string
-	tags: string[]
+	tags: (string | Tag)[]
 	difficulty: "easy" | "medium" | "hard"
 	isActive: boolean
 	createdAt: string
@@ -40,7 +40,7 @@ export interface History {
 	correctAnswers: number
 	timeSpent: number
 	details: AnswerDetail[]
-	tags: string[]
+	tags: (string | Tag)[]
 	testType: "random" | "custom"
 	createdAt: string
 	updatedAt: string
