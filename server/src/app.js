@@ -18,13 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // 允许所有来源跨域（开发环境可用，生产建议指定域名）
-app.use(cors({
-  origin: [
-    'http://49.233.166.239:3000',
-    'http://localhost:3000'
-  ],
-  credentials: true,
-}));
+app.use(cors());
 
 /**
  * 连接数据库
