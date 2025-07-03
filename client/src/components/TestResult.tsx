@@ -47,7 +47,7 @@ const TestResultComp: React.FC<TestResultProps> = ({ result, history, onRestart 
 												你的答案：{d.userAnswer}
 											</Typography>
 											<Typography variant='body2' color='success.main'>
-												正确答案：{d.correctAnswer}
+												正确答案：{d.correctAnswer || "（无）"}
 											</Typography>
 										</CardContent>
 									</Card>

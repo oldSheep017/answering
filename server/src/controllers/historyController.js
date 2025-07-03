@@ -172,6 +172,7 @@ const generateRandomTest = asyncHandler(async (req, res) => {
         type: 1,
         title: 1,
         options: 1,
+        answer: 1,
         tags: '$tagInfo',
         difficulty: 1,
       },
