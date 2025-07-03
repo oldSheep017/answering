@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
+const cors = require('cors');
 require('dotenv').config();
 
 // 导入中间件和路由
@@ -15,6 +16,15 @@ const tagRoutes = require('./routes/tags');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// 允许所有来源跨域（开发环境可用，生产建议指定域名）
+app.use(cors({
+  origin: [
+    'http://49.233.166.239:3000',
+    'http://localhost:3000'
+  ],
+  credentials: true,
+}));
 
 /**
  * 连接数据库
@@ -159,3 +169,10 @@ process.on('SIGINT', async () => {
 startServer();
 
 module.exports = app; 
+  process.exit(0);
+});
+
+// 启动服务器
+startServer();
+
+module.exports = app;
