@@ -6,15 +6,15 @@ import QuestionForm from "@/components/QuestionForm"
 import QuestionImportDialog from "@/components/QuestionImportDialog"
 import QuestionExportDialog from "@/components/QuestionExportDialog"
 import { useDispatch, useSelector } from "react-redux"
-import { RootState } from "@/store"
-import { createQuestion, updateQuestion, importQuestions, fetchQuestions } from "@/store/slices/questionsSlice"
+import { RootState, AppDispatch } from "@/store"
+import { createQuestion, updateQuestion, importQuestions, fetchQuestions, fetchQuestionStats } from "@/store/slices/questionsSlice"
 import { Question } from "@/types"
 
 /**
  * 题目管理页面组件
  */
 const Questions: React.FC = () => {
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<AppDispatch>()
 	const { items } = useSelector((state: RootState) => state.questions)
 	const [searchParams] = useSearchParams()
 	const [formOpen, setFormOpen] = useState(false)
@@ -39,17 +39,29 @@ const Questions: React.FC = () => {
 
 	// 提交表单
 	const handleSubmit = (data: Partial<Question> & { options?: string[] }) => {
+		const submitData = {
+			type: data.type as "choice" | "fill",
+			title: data.title || "",
+			options: data.options,
+			answer: data.answer || "",
+			tags: (data.tags || []).map(t => (typeof t === "string" ? t : t._id)),
+			difficulty: (data.difficulty as "easy" | "medium" | "hard") || "medium"
+		}
 		if (editData && editData._id) {
-			dispatch(updateQuestion({ id: editData._id, data }))
+			dispatch(updateQuestion({ id: editData._id, data: submitData }))
 		} else {
-			dispatch(createQuestion(data))
+			dispatch(createQuestion(submitData)).then(() => {
+				dispatch(fetchQuestionStats())
+			})
 		}
 		setFormOpen(false)
 	}
 
 	// 批量导入
 	const handleImport = (questions: any[]) => {
-		dispatch(importQuestions(questions))
+		dispatch(importQuestions(questions)).then(() => {
+			dispatch(fetchQuestionStats())
+		})
 		setImportOpen(false)
 		setTimeout(() => dispatch(fetchQuestions({})), 500)
 	}

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
 import { Question, QuestionStats, Pagination } from "@/types"
 import api from "@/services/api"
+import { fetchQuestionStats } from "./questionsSlice"
 
 interface QuestionsState {
 	items: Question[]
@@ -168,6 +169,10 @@ const questionsSlice = createSlice({
 				state.items.unshift(action.payload)
 				state.pagination.total += 1
 			})
+			.addCase(createQuestion.fulfilled, (state, action) => {
+				// 触发统计刷新
+				// 这里不能直接dispatch，只能在组件中dispatch(fetchQuestionStats())
+			})
 			.addCase(createQuestion.rejected, (state, action) => {
 				state.error = action.error.message || "创建题目失败"
 			})
@@ -197,11 +202,14 @@ const questionsSlice = createSlice({
 		// importQuestions
 		builder
 			.addCase(importQuestions.fulfilled, (state, action) => {
-				// 导入后刷新题库
 				if (action.payload && action.payload.questions) {
 					state.items = action.payload.questions
 					state.pagination.total = action.payload.imported || action.payload.questions.length
 				}
+			})
+			.addCase(importQuestions.fulfilled, (state, action) => {
+				// 触发统计刷新
+				// 这里不能直接dispatch，只能在组件中dispatch(fetchQuestionStats())
 			})
 			.addCase(importQuestions.rejected, (state, action) => {
 				state.error = action.error.message || "批量导入失败"

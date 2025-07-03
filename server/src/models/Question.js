@@ -22,14 +22,17 @@ const questionSchema = new mongoose.Schema(
       default: [],
       validate: {
         validator: function (options) {
-          // 选择题必须有4个选项
           if (this.type === 'choice') {
-            return options.length === 4;
+            // 允许2~8个选项
+            return (
+              Array.isArray(options) &&
+              options.length >= 2 &&
+              options.length <= 8
+            );
           }
-          // 填空题不需要选项
           return true;
         },
-        message: '选择题必须包含4个选项',
+        message: '选择题选项数量必须为2~8个',
       },
     },
     answer: {

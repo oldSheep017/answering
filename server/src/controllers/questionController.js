@@ -96,8 +96,11 @@ const createQuestion = asyncHandler(async (req, res) => {
   const { type, title, options, answer, tags, difficulty } = req.body;
 
   // 验证选择题必须有选项
-  if (type === 'choice' && (!options || options.length !== 4)) {
-    throw new AppError('选择题必须包含4个选项', 400);
+  if (
+    type === 'choice' &&
+    (!options || options.length < 2 || options.length > 8)
+  ) {
+    throw new AppError('选择题选项数量必须为2~8个', 400);
   }
 
   const question = await Question.create({
@@ -131,8 +134,11 @@ const updateQuestion = asyncHandler(async (req, res) => {
   }
 
   // 验证选择题必须有选项
-  if (type === 'choice' && (!options || options.length !== 4)) {
-    throw new AppError('选择题必须包含4个选项', 400);
+  if (
+    type === 'choice' &&
+    (!options || options.length < 2 || options.length > 8)
+  ) {
+    throw new AppError('选择题选项数量必须为2~8个', 400);
   }
 
   const updatedQuestion = await Question.findByIdAndUpdate(
@@ -192,7 +198,10 @@ const importQuestions = asyncHandler(async (req, res) => {
   // 验证题目数据
   const validQuestions = questions.filter((q) => {
     if (!q.type || !q.title || !q.answer) return false;
-    if (q.type === 'choice' && (!q.options || q.options.length !== 4))
+    if (
+      q.type === 'choice' &&
+      (!q.options || q.options.length < 2 || q.options.length > 8)
+    )
       return false;
     return true;
   });
