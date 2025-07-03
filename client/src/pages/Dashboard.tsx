@@ -1,58 +1,69 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Box, Typography, Grid, Card, CardContent, Button, CardActionArea, Stack, Paper, Divider } from "@mui/material"
 import { useNavigate } from "react-router-dom"
 import { School, Quiz, History, Add } from "@mui/icons-material"
+import api from "@/services/api"
 
-const DASHBOARD_CARDS = [
-	{
-		title: "总题目数",
-		value: 0,
-		color: "primary",
-		to: "/questions",
-		desc: "管理和导入题库"
-	},
-	{
-		title: "选择题",
-		value: 0,
-		color: "secondary",
-		to: "/questions?type=choice",
-		desc: "查看所有选择题"
-	},
-	{
-		title: "填空题",
-		value: 0,
-		color: "success",
-		to: "/questions?type=fill",
-		desc: "查看所有填空题"
-	},
-	{
-		title: "测试次数",
-		value: 0,
-		color: "warning",
-		to: "/history",
-		desc: "查看历史测试记录"
-	},
-	{
-		title: "自测系统",
-		value: "",
-		color: "info",
-		to: "/test",
-		desc: "开始自测，随机生成试卷"
-	},
-	{
-		title: "标签管理",
-		value: "",
-		color: "info",
-		to: "/manager/tags",
-		desc: "自定义题库标签"
-	}
-]
-
-/**
- * 仪表盘页面组件
- */
 const Dashboard: React.FC = () => {
 	const navigate = useNavigate()
+	const [stats, setStats] = useState({ total: 0, choiceCount: 0, fillCount: 0 })
+	const [testCount, setTestCount] = useState(0)
+
+	useEffect(() => {
+		// 获取题库统计
+		api.getQuestionStats().then(res => {
+			if (res) setStats(res)
+		})
+		// 获取测试次数
+		api.getScoreStats().then(res => {
+			if (res && res.stats) setTestCount(res.stats.totalTests || 0)
+		})
+	}, [])
+
+	const DASHBOARD_CARDS = [
+		{
+			title: "总题目数",
+			value: stats.total,
+			color: "primary",
+			to: "/questions",
+			desc: "管理和导入题库"
+		},
+		{
+			title: "选择题",
+			value: stats.choiceCount,
+			color: "secondary",
+			to: "/questions?type=choice",
+			desc: "查看所有选择题"
+		},
+		{
+			title: "填空题",
+			value: stats.fillCount,
+			color: "success",
+			to: "/questions?type=fill",
+			desc: "查看所有填空题"
+		},
+		{
+			title: "测试次数",
+			value: testCount,
+			color: "warning",
+			to: "/history",
+			desc: "查看历史测试记录"
+		},
+		{
+			title: "自测系统",
+			value: "",
+			color: "info",
+			to: "/test",
+			desc: "开始自测，随机生成试卷"
+		},
+		{
+			title: "标签管理",
+			value: "",
+			color: "info",
+			to: "/manager/tags",
+			desc: "自定义题库标签"
+		}
+	]
 
 	return (
 		<Box>
@@ -70,7 +81,7 @@ const Dashboard: React.FC = () => {
 			>
 				<Box sx={{ position: "relative", zIndex: 2 }}>
 					<Typography variant='h3' gutterBottom sx={{ fontWeight: 700 }}>
-						欢迎使用题库管理系统 🎓
+						欢迎使用题库管理系统
 					</Typography>
 					<Typography variant='h6' sx={{ mb: 2, opacity: 0.9 }}>
 						专为【亡羊Nassas】构建的智能题库管理与自测平台

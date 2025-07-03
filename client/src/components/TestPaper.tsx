@@ -144,11 +144,26 @@ const TestPaper: React.FC<TestPaperProps> = ({
 				{questions.map((_, idx) => (
 					<Button
 						key={idx}
-						size='small'
-						variant={idx === current ? "contained" : "outlined"}
-						color={answers[idx] ? "primary" : "inherit"}
+						size='medium'
+						variant={idx === current ? "contained" : answers[idx] ? "outlined" : "text"}
+						color={idx === current ? "primary" : answers[idx] ? "primary" : "inherit"}
 						onClick={() => onGo(idx)}
-						sx={{ minWidth: 32, p: 0, borderRadius: "50%" }}
+						sx={{
+							minWidth: 44,
+							height: 44,
+							p: 0,
+							borderRadius: "50%",
+							fontWeight: idx === current ? 700 : 400,
+							boxShadow: idx === current ? 3 : 0,
+							bgcolor: idx === current ? "primary.main" : answers[idx] ? "#fff" : "#f5f5f5",
+							color: idx === current ? "#fff" : answers[idx] ? "primary.main" : "#888",
+							border: idx === current ? "none" : answers[idx] ? "1.5px solid #1976d2" : "1.5px solid #ccc",
+							transition: "all 0.2s",
+							"&:hover": {
+								boxShadow: 4,
+								bgcolor: idx === current ? "primary.dark" : answers[idx] ? "#f0f7ff" : "#eee"
+							}
+						}}
 					>
 						{idx + 1}
 					</Button>
