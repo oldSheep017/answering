@@ -26,23 +26,28 @@ app.use(cors());
 const connectDatabase = async () => {
   const maxRetries = 5;
   const retryDelay = 5000; // 5秒
-  
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`🔄 尝试连接数据库 (第 ${attempt}/${maxRetries} 次)...`);
-      await database.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/question-bank');
+      await database.connect(
+        process.env.MONGODB_URI || 'mongodb://localhost:27017/question-bank'
+      );
       console.log('✅ 数据库连接成功');
       return;
     } catch (error) {
-      console.error(`❌ 数据库连接失败 (第 ${attempt}/${maxRetries} 次):`, error.message);
-      
+      console.error(
+        `❌ 数据库连接失败 (第 ${attempt}/${maxRetries} 次):`,
+        error.message
+      );
+
       if (attempt === maxRetries) {
         console.error('❌ 数据库连接最终失败，退出程序');
         process.exit(1);
       }
-      
+
       console.log(`⏳ ${retryDelay / 1000} 秒后重试...`);
-      await new Promise(resolve => setTimeout(resolve, retryDelay));
+      await new Promise((resolve) => setTimeout(resolve, retryDelay));
     }
   }
 };
@@ -136,7 +141,9 @@ const startServer = async () => {
       console.log(`🚀 服务器启动成功`);
       console.log(`📍 端口: ${PORT}`);
       console.log(`🌍 环境: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`📊 数据库: ${database.getConnectionStatus() ? '已连接' : '未连接'}`);
+      console.log(
+        `📊 数据库: ${database.getConnectionStatus() ? '已连接' : '未连接'}`
+      );
       console.log(`🔗 API 地址: http://localhost:${PORT}/api`);
       console.log(`💚 健康检查: http://localhost:${PORT}/health`);
     });
@@ -156,13 +163,6 @@ process.on('SIGTERM', async () => {
 process.on('SIGINT', async () => {
   console.log('🛑 收到 SIGINT 信号，正在关闭服务器...');
   await database.disconnect();
-  process.exit(0);
-});
-
-// 启动服务器
-startServer();
-
-module.exports = app; 
   process.exit(0);
 });
 
