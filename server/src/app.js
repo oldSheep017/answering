@@ -52,7 +52,7 @@ const connectDatabase = async () => {
  */
 const applyMiddleware = () => {
   // 安全中间件
-  applySecurityMiddleware(app);
+  // applySecurityMiddleware(app);
 
   // 请求体解析
   app.use(express.json({ limit: '10mb' }));
