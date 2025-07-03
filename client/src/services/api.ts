@@ -20,7 +20,7 @@ class ApiService {
 	private baseURL: string
 
 	constructor() {
-		this.baseURL = import.meta.env.VITE_API_URL || "/api"
+		this.baseURL = "http://49.233.166.239:5000/api"
 	}
 
 	/**
